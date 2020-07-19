@@ -40,6 +40,13 @@ defmodule Block do
   end
 
   @doc """
+
+  """
+  def get_struct(block) do
+    Agent.get(block, & &1)
+  end
+
+  @doc """
     Build the initial block of the chain
   """
   def zero do

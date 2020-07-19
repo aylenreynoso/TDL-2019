@@ -8,8 +8,7 @@ defmodule Blockchain do
   """
   def new do
     {:ok, block_agent} = Block.start_new_block()
-    #Crypto.put_hash(block_zero)
-    Block.update_put_hash(block_agent)
+    Block.update_put_hash(block_agent) #Crypto.put_hash(block_zero)
     [block_agent]
   end
 
@@ -17,14 +16,12 @@ defmodule Blockchain do
     Inserts the given data as a new block in the blockchain
   """
   def insert(blockchain, data) when is_list(blockchain) do
-    %Block{hash: prev} = hd(blockchain) #guarda en prev el hash del bloque head de la cadena
+    %Block{hash: prev} = Block.get_struct(hd(blockchain)) #guarda en prev el hash del bloque head de la cadena
 
-    block =
-      data
-      |> Block.start_link(prev)
-      |> Crypto.put_hash
-
-    [block | blockchain]
+    {:ok, block_agent} = Block.start_new_block(data, prev)
+    Block.update_put_hash(block_agent)
+    
+    [block_agent | blockchain]
   end
 
   @doc """
