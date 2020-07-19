@@ -20,6 +20,9 @@ defmodule Blockchain do
     GenServer.call(blockchain_pid, {:valid})
   end
 
+  def get_state(blockchain_pid) do
+    GenServer.call(blockchain_pid, {:get_state})
+  end
   #This is the server
 
   @impl true
@@ -43,6 +46,13 @@ defmodule Blockchain do
   def handle_call({:valid}, _from, blockchain_list) do
     valid = Blockchain.valid?(blockchain_list)
     {:reply, valid, blockchain_list}
+  end
+
+  @impl true
+  def handle_call({:get_state}, _from, blockchain_list) do
+
+    struct_list = Enum.map(blockchain_list, &Block.get_struct/1)
+    {:reply, struct_list, blockchain_list}
   end
 
 #-------------------------------------------------------
