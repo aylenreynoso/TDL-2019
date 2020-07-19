@@ -18,11 +18,11 @@ defmodule Block do
   end
 
   @doc """
-   Get the struct from the Agent
+    Get the struct from the Agent
   """
-  #def get(block) do
-  #  Agent.get(block)
-  #end
+  def get_struct(block) do
+    Agent.get(block, & &1)
+  end
 
   def update_put_hash(block) do
     Agent.update(block, Crypto, :put_hash, []) #manda a state como primer param de la funcion que usamos para updetear
@@ -40,13 +40,6 @@ defmodule Block do
   end
 
   @doc """
-
-  """
-  def get_struct(block) do
-    Agent.get(block, & &1)
-  end
-
-  @doc """
     Build the initial block of the chain
   """
   def zero do
@@ -60,14 +53,22 @@ defmodule Block do
   @doc """
     calculate the hash of the block and compares it with th stored value
   """
-  def valid?(%Block{} = block) do
-    Crypto.hash(block) == block.hash
+  #def valid?(%Block{} = block) do
+    #Crypto.hash(block) == block.hash
+  #end
+
+  def valid?(block) do
+    block_struct = Block.get_struct(block)
+    Crypto.hash(block_struct) == block_struct.hash
   end
+
 
   @doc """
     compares the value of the previous block hash to the value stored in prev_hash
   """
-  def valid?(%Block{} = block, %Block{} = prev_block) do
-    (Crypto.hash(prev_block) == block.prev_hash) && valid?(block)
+  def valid?(block, prev_block) do
+    prev_block_struct = Block.get_struct(prev_block)
+    block_struct = Block.get_struct(block)
+    (Crypto.hash(prev_block_struct) == block_struct.prev_hash) && valid?(block)
   end
 end
