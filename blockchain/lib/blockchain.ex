@@ -4,7 +4,7 @@ defmodule Blockchain do
   @moduledoc """
   Documentation for Blockchain.
   """
-
+  #TODO: implement get state for obtaining the whole blockain info
   # This is the client
 
   def new_client() do
@@ -13,17 +13,6 @@ defmodule Blockchain do
 
   def insert_client(blockchain_pid, data) do
     GenServer.cast(blockchain_pid, {:insert, data}) #=> :ok
-  end
-
-  @impl true
-  def handle_cast({:insert, data}, blockchain_list) do
-
-    %Block{hash: prev} = Block.get_struct(hd(blockchain_list))
-
-    {:ok, block_agent} = Block.start_new_block(data, prev)
-    Block.update_put_hash(block_agent)
-
-    {:noreply, [block_agent | blockchain_list]}
   end
 
   def valid_client?(blockchain_pid) do
@@ -38,18 +27,16 @@ defmodule Blockchain do
     {:ok, blockchain_list} #state: list of Blocks
   end
 
-  #@impl true
-  #def handle_call({:insert, data}, _from, blockchain_list) do
+  @impl true
+  def handle_cast({:insert, data}, blockchain_list) do
 
-  #  %Block{hash: prev} = Block.get_struct(hd(blockchain_list))
+    %Block{hash: prev} = Block.get_struct(hd(blockchain_list))
 
-  #  {:ok, block_agent} = Block.start_new_block(data, prev)
-  #  Block.update_put_hash(block_agent)
+    {:ok, block_agent} = Block.start_new_block(data, prev)
+    Block.update_put_hash(block_agent)
 
-  #  new_state = [block_agent | blockchain_list]
-
-  #  {:reply, new_state ,new_state}
-#  end
+    {:noreply, [block_agent | blockchain_list]}
+  end
 
   @impl true
   def handle_call({:valid}, _from, blockchain_list) do
