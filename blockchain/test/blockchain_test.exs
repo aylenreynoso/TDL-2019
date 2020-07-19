@@ -12,4 +12,9 @@ defmodule BlockchainTest do
     data = "soy un bloque"
     assert :ok == Blockchain.insert_client(blockchain_pid, data)
   end
+
+  test "the blockain is in a valid state", %{blockchain: blockchain_pid} do
+
+    assert :true == Blockchain.valid_client?(blockchain_pid)
+  end
 end
