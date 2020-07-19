@@ -7,8 +7,9 @@ defmodule Blockchain do
   #TODO: implement get state for obtaining the whole blockain info
   # This is the client
 
-  def new_client() do
-    GenServer.start_link(__MODULE__, :ok, [])
+  def start_link(opts) do
+    #convencion con el nombre start_link
+    GenServer.start_link(__MODULE__, :ok, opts)
   end
 
   def insert_client(blockchain_pid, data) do
