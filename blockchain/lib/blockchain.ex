@@ -7,7 +7,10 @@ defmodule Blockchain do
     creates a new blockchain with a zero block
   """
   def new do
-    [Crypto.put_hash(Block.zero)]
+    {:ok, block_agent} = Block.start_new_block()
+    #Crypto.put_hash(block_zero)
+    Block.update_put_hash(block_agent)
+    [block_agent]
   end
 
   @doc """
@@ -18,7 +21,7 @@ defmodule Blockchain do
 
     block =
       data
-      |> Block.new(prev)
+      |> Block.start_link(prev)
       |> Crypto.put_hash
 
     [block | blockchain]
