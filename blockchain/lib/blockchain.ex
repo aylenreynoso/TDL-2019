@@ -4,7 +4,8 @@ defmodule Blockchain do
   @moduledoc """
   Documentation for Blockchain.
   """
-  #TODO: implement get state for obtaining the whole blockain info
+  #TODO: ahora todos los blocks estan linkeados a blockchain, si uno muere todo blockchain muere
+  #necesitamos linkear los blockes a un supervisor
   # This is the client
 
   def start_link(opts) do
