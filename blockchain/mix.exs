@@ -1,6 +1,9 @@
 defmodule Blockchain.MixProject do
   use Mix.Project
 
+  #Cuando lamamos a iex -S mix automaticamente inicia la app llamando
+  #Application.start(:blockchain)
+
   def project do
     [
       app: :blockchain,
@@ -14,7 +17,9 @@ defmodule Blockchain.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      #agrego que modulo implementa application
+      mod: {BlockchainApp, []}
     ]
   end
 
