@@ -1,13 +1,11 @@
 defmodule Blockchain do
 
   use GenServer
-
   @moduledoc """
   Documentation for Blockchain.
   """
   #TODO: ahora todos los blocks estan linkeados a blockchain, si uno muere todo blockchain muere
   #necesitamos linkear los blockes a un supervisor
-  
   # This is the client
 
   def start_link(opts) do
@@ -39,10 +37,18 @@ defmodule Blockchain do
 
     %Block{hash: prev} = Block.get_struct(hd(blockchain_list))
 
-    {:ok, block_agent} = Block.start_new_block(data, prev)
-    Block.update_put_hash(block_agent)
+    #{:ok, block_agent} = Block.start_link(data, prev)
 
-    {:noreply, [block_agent | blockchain_list]}
+    children_spec = %{
+                        id: Block,
+                        start: {Block, :start_link, [[data: data, prev_hash: prev]]}
+                      }
+
+    {:ok, block} = DynamicSupervisor.start_child(BlockSupervisor, children_spec)
+
+    Block.update_put_hash(block)
+
+    {:noreply, [block | blockchain_list]}
   end
 
   @impl true

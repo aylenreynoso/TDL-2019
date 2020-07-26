@@ -7,12 +7,16 @@ defmodule Block do
   @doc """
    starts a new Block
   """
-  def start_new_block(data, prev_hash) do
+
+  def start_link(opts) do
+
+    {data, opts} = Keyword.pop(opts, :data)
+    {prev_hash, _ } = Keyword.pop(opts, :prev_hash)
     new_block = new(data, prev_hash)
     Agent.start_link(fn -> new_block end)
   end
 
-  def start_new_block() do
+  def start_new_block() do #este bloque sera creado fuera del arbol de supervision
     new_block = zero()
     Agent.start_link(fn -> new_block end)
   end
