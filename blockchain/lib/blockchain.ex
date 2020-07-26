@@ -40,7 +40,8 @@ defmodule Blockchain do
     #{:ok, block_agent} = Block.start_link(data, prev) se inica mediante Supervisor
     children_spec = %{
                         id: Block,
-                        start: {Block, :start_link, [[data: data, prev_hash: prev]]}
+                        start: {Block, :start_link, [[data: data, prev_hash: prev]]},
+                        restart: :temporary
                       }
 
     {:ok, block} = DynamicSupervisor.start_child(BlockSupervisor, children_spec)
@@ -65,6 +66,7 @@ defmodule Blockchain do
   @impl true
   def handle_info({:DOWN, _ref, :process, pid, _reason}, blockchain_list) do
     blockchain_list = List.delete(blockchain_list, pid)
+    #rehashear todo el blockchain
     {:noreply, blockchain_list}
   end
 

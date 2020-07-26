@@ -1,6 +1,6 @@
 defmodule Block do
 
-  use Agent
+  use Agent, restart: :temporary
 
   defstruct [:data, :timestamp, :prev_hash, :hash]
 
