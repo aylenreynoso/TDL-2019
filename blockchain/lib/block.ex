@@ -13,7 +13,9 @@ defmodule Block do
     {data, opts} = Keyword.pop(opts, :data)
     {prev_hash, _ } = Keyword.pop(opts, :prev_hash)
     new_block = new(data, prev_hash)
+    new_block = Crypto.put_hash(new_block)
     Agent.start_link(fn -> new_block end)
+
   end
 
   def start_new_block() do #este bloque sera creado fuera del arbol de supervision
@@ -57,9 +59,9 @@ defmodule Block do
   @doc """
     calculate the hash of the block and compares it with th stored value
   """
-  #def valid?(%Block{} = block) do
-    #Crypto.hash(block) == block.hash
-  #end
+  def valid?(%Block{} = block) do
+    Crypto.hash(block) == block.hash
+  end
 
   def valid?(block) do
     block_struct = Block.get_struct(block)

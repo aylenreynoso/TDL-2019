@@ -4,8 +4,7 @@ defmodule Blockchain do
   @moduledoc """
   Documentation for Blockchain.
   """
-  #TODO: ahora todos los blocks estan linkeados a blockchain, si uno muere todo blockchain muere
-  #necesitamos linkear los blockes a un supervisor
+
   # This is the client
 
   def start_link(opts) do
@@ -24,6 +23,7 @@ defmodule Blockchain do
   def get_state(blockchain_pid) do
     GenServer.call(blockchain_pid, {:get_state})
   end
+
   #This is the server
 
   @impl true
@@ -37,17 +37,15 @@ defmodule Blockchain do
 
     %Block{hash: prev} = Block.get_struct(hd(blockchain_list))
 
-    #{:ok, block_agent} = Block.start_link(data, prev)
-
+    #{:ok, block_agent} = Block.start_link(data, prev) se inica mediante Supervisor
     children_spec = %{
                         id: Block,
                         start: {Block, :start_link, [[data: data, prev_hash: prev]]}
                       }
 
     {:ok, block} = DynamicSupervisor.start_child(BlockSupervisor, children_spec)
-
-    Block.update_put_hash(block)
-
+    #Block.update_put_hash(block) ahora se hashea en block
+    Process.monitor(block)
     {:noreply, [block | blockchain_list]}
   end
 
@@ -62,6 +60,12 @@ defmodule Blockchain do
 
     struct_list = Enum.map(blockchain_list, &Block.get_struct/1)
     {:reply, struct_list, blockchain_list}
+  end
+
+  @impl true
+  def handle_info({:DOWN, _ref, :process, pid, _reason}, blockchain_list) do
+    blockchain_list = List.delete(blockchain_list, pid)
+    {:noreply, blockchain_list}
   end
 
 #-------------------------------------------------------
