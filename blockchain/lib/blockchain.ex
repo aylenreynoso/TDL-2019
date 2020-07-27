@@ -66,7 +66,7 @@ defmodule Blockchain do
   @impl true
   def handle_info({:DOWN, _ref, :process, pid, _reason}, blockchain_list) do
     blockchain_list = List.delete(blockchain_list, pid)
-    #rehashear todo el blockchain
+    ## TODO: rehashear todo el blockchain
     {:noreply, blockchain_list}
   end
 
