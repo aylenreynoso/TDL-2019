@@ -19,7 +19,7 @@ defmodule BlockchainSever.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {BlockchainSever.Application, []}
+      mod: {BlockchainServer.Application, []}
     ]
   end
 

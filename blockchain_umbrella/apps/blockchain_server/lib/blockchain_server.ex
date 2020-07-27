@@ -1,4 +1,4 @@
-defmodule BlockchainSever do
+defmodule BlockchainServer do
 
   require Logger
   def accept(port) do
@@ -13,7 +13,13 @@ defmodule BlockchainSever do
 
   defp loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
-    serve(client)
+    #Task.start_link(fn-> serve(client) end) si se cae se cae el loop_acceptor
+    #Usamos un sup 1:1 build in de Task, start_child(nombre/pid, fn)
+    {:ok, task_pid} = Task.Supervisor.start_child(BlockchainServer.TaskSupervisor, fn -> serve(client) end)
+    #This makes the child process the “controlling process” of the client socket.
+    #If we didn’t do this, the acceptor would bring down all the clients if it crashed
+    #because sockets would be tied to the process that accepted them (which is the default behaviour).
+    :ok = :gen_tcp.controlling_process(client, task_pid)
     loop_acceptor(socket)
   end
 
