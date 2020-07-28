@@ -5,7 +5,7 @@ defmodule BlockchainServer do
     {:ok, socket} = :gen_tcp.listen(port, [:binary, #recibe data como binarios en lugar de listas
                                            packet: :line, #recibe data line by line
                                            active: false, #blockea :gen_tcp.recv/2 hasta que la data este disponible
-                                           reuseaddr: true# permite reutilizar la direccion si un listener crashea
+                                           reuseaddr: true #permite reutilizar la direccion si un listener crashea
                                            ])
     Logger.info("Aceptando conexiones en puerto #{port}")
     loop_acceptor(socket)
@@ -13,14 +13,14 @@ defmodule BlockchainServer do
 
   defp loop_acceptor(socket) do
     {:ok, client} = :gen_tcp.accept(socket)
+
     #Task.start_link(fn-> serve(client) end) si se cae se cae el loop_acceptor
-    #Usamos un sup 1:1 build in de Task, start_child(nombre/pid, fn)
-    #{:ok, task_pid} = Task.Supervisor.start_child(BlockchainServer.TaskSupervisor, fn -> serve(client) end)
-    #This makes the child process the “controlling process” of the client socket.
+    {:ok, task_pid} = Task.Supervisor.start_child(BlockchainServer.TaskSupervisor, fn -> serve(client) end)
+
+    :ok = :gen_tcp.controlling_process(client, task_pid)
+    #This makes the child process(task) the “controlling process” of the client socket.
     #If we didn’t do this, the acceptor would bring down all the clients if it crashed
-    #because sockets would be tied to the process that accepted them (which is the default behaviour).
-    #:ok = :gen_tcp.controlling_process(client, task_pid)
-    serve(client)
+    #because sockets would be tied to the process that accepted them(loop_acceptor).
     loop_acceptor(socket)
   end
 

@@ -1,8 +1,8 @@
-defmodule BlockchainSeverTest do
+defmodule BlockchainServerTest do
   use ExUnit.Case
-  doctest BlockchainSever
+  doctest BlockchainServer
 
   test "greets the world" do
-    assert BlockchainSever.hello() == :world
+    assert BlockchainServer.hello() == :world
   end
 end
