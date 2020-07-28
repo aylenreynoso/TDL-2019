@@ -10,7 +10,7 @@ defmodule BlockchainServer.Application do
 
     port = String.to_integer(System.get_env("PORT") || "4040")
     children = [
-      {Task.Supervisor, name: BlockchainServer.TaskSupervisor}, #supervisor 1:1 build-in de Task
+      #{Task.Supervisor, name: BlockchainServer.TaskSupervisor}, #supervisor 1:1 build-in de Task
       {Task, fn -> BlockchainServer.accept(port) end}
     ]
 
