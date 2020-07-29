@@ -25,18 +25,45 @@ defmodule BlockchainServer do
   end
 
   defp serve(socket) do
-    socket
-    |> read_line()
-    |> write_line(socket)
+    #socket |> read_line()|> write_line(socket) serve(socket)
+    msg =
+      case read_line(socket) do
+        {:ok, data} ->
+          case BlockchainServer.Command.parse(data) do
+            {:ok, command} ->
+              BlockchainServer.Command.run(command)
+            {:error, _ } = err ->
+              err
+          end
+        {:error, _ } = err ->
+          err
+      end
+    #TODO cambiar clauses a with
+    write_line(socket, msg)
     serve(socket)
   end
 
   defp read_line(socket) do
-    {:ok, data} = :gen_tcp.recv(socket, 0)
-    data
+    :gen_tcp.recv(socket, 0)
   end
 
-  defp write_line(line, socket)do
-    :gen_tcp.send(socket, line)
+  defp write_line(socket, {:ok, data})do #tupla que retorna run
+    :gen_tcp.send(socket, data)
+  end
+
+  defp write_line(socket, {:error, :unknown_command}) do
+    # Error conocido, informar al cliente
+    :gen_tcp.send(socket, "UNKNOWN_COMMAND")
+  end
+
+  defp write_line(socket, {:error, :closed}) do
+    # Conexion cerrada, salir
+    exit(:shutdown)
+  end
+
+  defp write_line(socket, {:error, error}) do
+    # Error desconocido, informar al liente y salir
+    :gen_tcp.send(socket, "ERROR\r\n")
+    exit(error)
   end
 end
