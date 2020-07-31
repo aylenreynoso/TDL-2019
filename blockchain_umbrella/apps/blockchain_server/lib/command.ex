@@ -2,13 +2,13 @@ defmodule BlockchainServer.Command do
   @doc ~S"""
     Parsea la lina dada a un comando
     ##Ejemplo
-        iex> BlockchainServer.Command.parse("CREATE data\r\n")
-        {:ok, {:create, "data"}}
+        iex> BlockchainServer.Command.parse("INSERT data\r\n")
+        {:ok, {:insert, "data"}}
   """
 
   def parse(line) do
     case String.split(line)do
-      ["CREATE", data] -> {:ok, {:create, data}}
+      ["INSERT", data] -> {:ok, {:insert, data}}
       _ -> {:error, :unknown_command}
     end
   end
@@ -17,7 +17,8 @@ defmodule BlockchainServer.Command do
   Corre un comando dado
   """
 
-  def run(command) do
+  def run({:insert, data}) do
+    Blockchain.insert_client(Blockchain, data)
     {:ok, "Ok \r\n"}
 
   end

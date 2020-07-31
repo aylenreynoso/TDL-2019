@@ -1,11 +1,8 @@
 defmodule BlockchainServer.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
 
-  #PORT=4321 mix run --no-halt
   def start(_type, _args) do
 
     port = String.to_integer(System.get_env("PORT") || "4040")
