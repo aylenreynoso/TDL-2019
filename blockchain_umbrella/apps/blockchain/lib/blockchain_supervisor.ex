@@ -10,7 +10,8 @@ defmodule BlockchainSupervisor do
   def init(:ok) do
     children = [
       {DynamicSupervisor, name: BlockSupervisor, strategy: :one_for_one}, #ademas en temporary
-      {Blockchain, name: Blockchain} #enviara name como opts
+      {Blockchain, name: Blockchain}, #enviara name como opts
+      {Task.Supervisor, name: Blockchain.RouterTask}
     ]
     Supervisor.init(children, strategy: :one_for_all)
   end
