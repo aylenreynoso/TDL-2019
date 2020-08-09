@@ -18,9 +18,6 @@ defmodule BlockchainServer do
     {:ok, task_pid} = Task.Supervisor.start_child(BlockchainServer.TaskSupervisor, fn -> serve(client) end)
 
     :ok = :gen_tcp.controlling_process(client, task_pid)
-    #This makes the child process(task) the “controlling process” of the client socket.
-    #If we didn’t do this, the acceptor would bring down all the clients if it crashed
-    #because sockets would be tied to the process that accepted them(loop_acceptor).
     loop_acceptor(socket)
   end
 
@@ -62,7 +59,7 @@ defmodule BlockchainServer do
   end
 
   defp write_line(socket, {:error, error}) do
-    # Error desconocido, informar al liente y salir
+    # Error desconocido, informar al cliente y salir
     :gen_tcp.send(socket, "ERROR\r\n")
     exit(error)
   end

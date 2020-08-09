@@ -4,7 +4,7 @@ defmodule Crypto do
       Erlang's Build-in SHA256 hashing module
     """
     #specify which fields to hash in a block
-    @hash_fields [:data, :timestamp, :prev_hash]
+    @hash_fields [:data, :prev_hash]
 
     #calculates SHA256 for a binary string
     defp sha256(binary) do

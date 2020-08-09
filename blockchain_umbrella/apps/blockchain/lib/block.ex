@@ -18,7 +18,7 @@ defmodule Block do
 
   end
 
-  def start_new_block() do #este bloque sera creado fuera del arbol de supervision
+  def start_new_block() do
     new_block = zero()
     Agent.start_link(fn -> new_block end)
   end
@@ -67,7 +67,6 @@ defmodule Block do
     block_struct = Block.get_struct(block)
     Crypto.hash(block_struct) == block_struct.hash
   end
-
 
   @doc """
     compares the value of the previous block hash to the value stored in prev_hash

@@ -12,11 +12,15 @@ defmodule Blockchain do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  def insert_client(blockchain_pid, data) do
+  def insert(blockchain_pid, data) do
     GenServer.cast(blockchain_pid, {:insert, data}) #=> :ok
   end
 
-  def valid_client?(blockchain_pid) do
+  def insert(blockchain_pid) do
+    GenServer.cast(blockchain_pid, {:insert}) #=> :ok
+  end
+
+  def valid?(blockchain_pid) do
     GenServer.call(blockchain_pid, {:valid})
   end
 
@@ -28,8 +32,16 @@ defmodule Blockchain do
 
   @impl true
   def init(:ok) do
-    blockchain_list = Blockchain.new()
-    {:ok, blockchain_list} #state: list of Blocks
+    {:ok, []} #state: list of Blocks
+  end
+
+  @impl true
+  def handle_cast({:insert}, blockchain_list) do
+
+    {:ok, block} = Block.start_new_block()
+    Block.update_put_hash(block) #Crypto.put_hash(block_zero)
+
+    {:noreply, [block | blockchain_list]}
   end
 
   @impl true
@@ -45,14 +57,13 @@ defmodule Blockchain do
                       }
 
     {:ok, block} = DynamicSupervisor.start_child(BlockSupervisor, children_spec)
-    #Block.update_put_hash(block) ahora se hashea en block
     Process.monitor(block)
     {:noreply, [block | blockchain_list]}
   end
 
   @impl true
   def handle_call({:valid}, _from, blockchain_list) do
-    valid = Blockchain.valid?(blockchain_list)
+    valid = Blockchain.valid_helper?(blockchain_list)
     {:reply, valid, blockchain_list}
   end
 
@@ -71,19 +82,11 @@ defmodule Blockchain do
   end
 
 #-------------------------------------------------------
-  @doc """
-    creates a new blockchain with a zero block
-  """
-  def new do
-    {:ok, block_agent} = Block.start_new_block()
-    Block.update_put_hash(block_agent) #Crypto.put_hash(block_zero)
-    [block_agent]
-  end
 
   @doc """
     validates the complete blockchain
   """
-  def valid?(blockchain) when is_list(blockchain) do
+  def valid_helper?(blockchain) when is_list(blockchain) do
     zero = Enum.reduce_while(blockchain, nil, fn prev,current ->
       cond do
         current == nil -> {:cont, prev}
